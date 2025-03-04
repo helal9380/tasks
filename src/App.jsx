@@ -1,51 +1,44 @@
 /** @format */
 
-import { useState } from "react";
+import { useReducer } from "react";
 import "./App.css";
 import AddTask from "./components/AddTask";
 import TasksList from "./components/TasksList";
+import { taskReducer } from "./reducer/reducer";
+import { getNextId } from "./util/nextId";
 
 const data = [
   { id: 0, text: "how to learn react", done: true },
   { id: 1, text: "The Next js", done: false },
   { id: 2, text: "React is a components base library", done: false },
 ];
-const getNextId = (data) => {
-  const nextId = data.reduce((prev, current) =>
-    prev && prev.id > current.id ? prev.id : current.id
-  );
-  return nextId + 1;
-};
+
 function App() {
-  const [tasks, setTasks] = useState(data);
+  const [tasks, dispatch] = useReducer(taskReducer, data);
 
   // all handler here
 
   const handleAddTask = (text) => {
-    setTasks([
-      ...tasks,
-      {
-        id: getNextId(tasks),
-        text,
-        done: false,
-      },
-    ]);
+    dispatch({
+      type: "added",
+      id: getNextId(tasks),
+      text,
+      done: false,
+    });
   };
 
   const handleDelete = (taskId) => {
-    setTasks(tasks.filter((task) => task.id !== taskId));
+    dispatch({
+      type: "deleted",
+      id: taskId,
+    });
   };
 
   const handleChangeTask = (task) => {
-    setTasks(
-      tasks.map((t) => {
-        if (t.id === task.id) {
-          return task;
-        } else {
-          return t;
-        }
-      })
-    );
+    dispatch({
+      type: "changed",
+      task,
+    });
   };
   return (
     <>
